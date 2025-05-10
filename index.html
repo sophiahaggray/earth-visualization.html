@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A World Within a World</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: white;
+            font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        /* Homepage styles */
+        .container {
+            position: relative;
+            width: 500px;
+            height: 500px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .earth {
+            width: 300px;
+            height: 300px;
+            background-color: #3DB2FF; /* Blue for oceans */
+            border-radius: 50%;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .earth:hover {
+            transform: scale(1.05);
+        }
+        
+        .rotating-text {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            animation: rotate 30s linear infinite;
+            pointer-events: none; /* Ensure text doesn't interfere with clicks */
+        }
+        
+        .text-circle {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            left: 0;
+            top: 0;
+        }
+        
+        .char {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            transform-origin: 0 250px;
+            font-size: 24px;
+            font-weight: bold;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        @keyframes rotate {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+        
+        .land {
+            position: absolute;
+            background-color: #4CD175; /* Green for land */
+        }
+        
+        /* More realistic continent shapes */
+        /* North America */
+        .land-1 {
+            width: 30%;
+            height: 30%;
+            top: 15%;
+            left: 15%;
+            clip-path: polygon(20% 0%, 80% 10%, 100% 40%, 90% 80%, 60% 100%, 20% 90%, 0% 40%);
+        }
+        
+        /* Eurasia */
+        .land-2 {
+            width: 50%;
+            height: 30%;
+            top: 20%;
+            right: 10%;
+            clip-path: polygon(0% 30%, 30% 0%, 70% 10%, 100% 40%, 85% 90%, 40% 100%, 10% 80%);
+        }
+        
+        /* South America */
+        .land-3 {
+            width: 20%;
+            height: 30%;
+            top: 50%;
+            left: 25%;
+            clip-path: polygon(30% 0%, 80% 10%, 100% 30%, 80% 80%, 30% 100%, 0% 50%);
+        }
+        
+        /* Africa */
+        .land-4 {
+            width: 25%;
+            height: 35%;
+            top: 45%;
+            right: 33%;
+            clip-path: polygon(20% 0%, 80% 0%, 100% 40%, 80% 100%, 30% 90%, 0% 40%);
+        }
+        
+        /* Australia */
+        .land-5 {
+            width: 20%;
+            height: 15%;
+            bottom: 25%;
+            right: 25%;
+            clip-path: polygon(10% 10%, 90% 0%, 100% 30%, 90% 90%, 30% 100%, 0% 70%);
+        }
+        
+        /* Antarctica */
+        .land-6 {
+            width: 25%;
+            height: 15%;
+            bottom: 15%;
+            left: 35%;
+            border-radius: 50%;
+        }
+        
+        .title-text {
+            font-size: 24px;
+            font-weight: bold;
+            position: absolute;
+            text-align: center;
+            width: 100%;
+            top: -60px;
+        }
+        
+        .instruction-text {
+            font-size: 16px;
+            margin-top: 30px;
+            color: #333;
+        }
+        
+        /* Interactive journey styles - initially hidden */
+        .journey-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background-color: white;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+        
+        /* Layer visualizations */
+        .earth-layer {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        
+        /* Inner Core */
+        .inner-core {
+            width: 120px;
+            height: 120px;
+            background-color: #FFD700; /* Bright yellow */
+            z-index: 4;
+        }
+        
+        /* Outer Core */
+        .outer-core {
+            width: 240px;
+            height: 240px;
+            background-color: #FFA64D; /* Orange */
+            z-index: 3;
+        }
+        
+        /* Mantle */
+        .mantle {
+            width: 360px;
+            height: 360px;
+            background-color: #E5243B; /* Red */
+            z-index: 2;
+        }
+        
+        /* Crust */
+        .crust {
+            width: 440px;
+            height: 440px;
+            background-color: #4A3021; /* Brown */
+            z-index: 1;
+        }
+        
+        /* Layer information panel */
+        .layer-info {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 30px;
+            width: 80%;
+            max-width: 800px;
+            margin: 0 auto;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 15px 20px;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .layer-info h2 {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #000;
+        }
+        
+        .layer-info h3 {
+            font-size: 14px;
+            font-weight: bold;
+            font-style: italic;
+            margin-bottom: 10px;
+            color: #555;
+        }
+        
+        .layer-info p {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+        }
+        
+        .back-button {
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            padding: 12px 20px;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            z-index: 10;
+        }
+        
+        .back-button:hover {
+            background-color: #555;
+        }
+        
+        /* Media query for responsive design */
+        @media (max-width: 900px) {
+            .layer-info {
+                width: 90%;
+                bottom: 20px;
+                padding: 12px 15px;
+            }
+            
+            .layer-info h2 {
+                font-size: 18px;
+            }
+            
+            .layer-info h3 {
+                font-size: 12px;
+                margin-bottom: 8px;
+            }
+            
+            .layer-info p {
+                font-size: 12px;
+                line-height: 1.5;
+            }
+            
+            .inner-core {
+                width: 80px;
+                height: 80px;
+            }
+            
+            .outer-core {
+                width: 180px;
+                height: 180px;
+            }
+            
+            .mantle {
+                width: 280px;
+                height: 280px;
+            }
+            
+            .crust {
+                width: 340px;
+                height: 340px;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .layer-info {
+                width: 95%;
+                bottom: 10px;
+                padding: 10px;
+            }
+            
+            .earth {
+                width: 220px;
+                height: 220px;
+            }
+            
+            .inner-core {
+                width: 60px;
+                height: 60px;
+            }
+            
+            .outer-core {
+                width: 120px;
+                height: 120px;
+            }
+            
+            .mantle {
+                width: 180px;
+                height: 180px;
+            }
+            
+            .crust {
+                width: 240px;
+                height: 240px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Home page view -->
+    <div class="container">
+        <div class="rotating-text">
+            <div class="text-circle" id="textCircle"></div>
+        </div>
+        
+        <div class="earth" id="earthButton" tabindex="0" role="button" aria-label="Click to explore Earth's layers">
+            <div class="land land-1"></div>
+            <div class="land land-2"></div>
+            <div class="land land-3"></div>
+            <div class="land land-4"></div>
+            <div class="land land-5"></div>
+            <div class="land land-6"></div>
+        </div>
+    </div>
+    
+    <!-- Journey view (initially hidden) -->
+    <div class="journey-container" id="journeyContainer">
+        <button class="back-button" id="backButton">Back to Home</button>
+        
+        <!-- Earth layers -->
+        <div class="earth-layer inner-core" id="innerCore"></div>
+        <div class="earth-layer outer-core" id="outerCore"></div>
+        <div class="earth-layer mantle" id="mantle"></div>
+        <div class="earth-layer crust" id="crust"></div>
+        
+        <!-- Layer information panels -->
+        <div class="layer-info" id="innerCoreInfo">
+            <h2>The Inner Core</h2>
+            <h3>5,150–6,371 kilometers deep</h3>
+            <p>At the center, a glowing relic of Earth's origin. This is the inner core: a solid sphere of iron, dense and hot, suspended in a dance of gravity and fire. It spins independently, silently, and with purpose. Born from the violent beginnings of the planet, it remains a time capsule of Earth's earliest days. Though no one has seen it, it shapes the world in ways we are only beginning to understand.</p>
+        </div>
+        
+        <div class="layer-info" id="outerCoreInfo">
+            <h2>The Outer Core</h2>
+            <h3>2,890–5,150 kilometers deep</h3>
+            <p>A churning ocean of molten metal. Nearly 3,000 kilometers beneath the surface, the outer core is a river of liquid iron and nickel in constant, swirling motion. It is this movement that generates Earth's magnetic field—our invisible shield against the harsh radiation of space. Without it, the delicate balance of life would vanish in an instant. Yet this guardian, so vital, is forever out of reach.</p>
+        </div>
+        
+        <div class="layer-info" id="mantleInfo">
+            <h2>The Mantle</h2>
+            <h3>70–2,890 kilometers deep</h3>
+            <p>Vast, unseen, and in perpetual motion. The mantle is a realm of heat and slow power. Beneath the crust, immense pressure and temperature turn solid rock into a flowing current—rising and falling like the tides of an ancient sea. These movements, over time, drive the formation of continents, volcanoes, and the very surface of the Earth. It is the planet's great sculptor, hidden in shadow.</p>
+        </div>
+        
+        <div class="layer-info" id="crustInfo">
+            <h2>The Crust</h2>
+            <h3>0–70 kilometers below the surface</h3>
+            <p>This is the cradle of life. A fragile, shifting skin that cloaks our world, the crust is where forests grow, rivers run, and humanity thrives. Though it appears still, beneath our feet lies a restless force. The continents drift imperceptibly, their movements shaping mountains, valleys, and oceans. It is here, on this wafer-thin layer, that all living stories unfold.</p>
+        </div>
+    </div>
+
+    <script>
+        // Create rotating text
+        const title = "A World Within a World";
+        const textCircle = document.getElementById('textCircle');
+        
+        for (let i = 0; i < title.length; i++) {
+            const char = document.createElement('span');
+            char.className = 'char';
+            char.textContent = title[i];
+            const angle = (i * 11) - 100; // Distribute characters evenly, starting at the top
+            char.style.transform = `rotate(${angle}deg)`;
+            textCircle.appendChild(char);
+        }
+        
+        // Earth click interaction
+        const earthButton = document.getElementById('earthButton');
+        const journeyContainer = document.getElementById('journeyContainer');
+        const backButton = document.getElementById('backButton');
+        
+        // Layer elements
+        const innerCore = document.getElementById('innerCore');
+        const outerCore = document.getElementById('outerCore');
+        const mantle = document.getElementById('mantle');
+        const crust = document.getElementById('crust');
+        
+        // Layer info elements
+        const innerCoreInfo = document.getElementById('innerCoreInfo');
+        const outerCoreInfo = document.getElementById('outerCoreInfo');
+        const mantleInfo = document.getElementById('mantleInfo');
+        const crustInfo = document.getElementById('crustInfo');
+        
+        // Show journey view when Earth is clicked
+        earthButton.addEventListener('click', () => {
+            journeyContainer.style.display = 'flex';
+            
+            // Show inner core by default
+            showLayer('inner');
+        });
+        
+        // Keyboard support
+        earthButton.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                journeyContainer.style.display = 'flex';
+                showLayer('inner');
+            }
+        });
+        
+        // Return to home view when back button is clicked
+        backButton.addEventListener('click', () => {
+            journeyContainer.style.display = 'none';
+            hideAllLayers();
+        });
+        
+        // Track mouse movement for layer display
+        journeyContainer.addEventListener('mousemove', (e) => {
+            // Get container dimensions
+            const rect = journeyContainer.getBoundingClientRect();
+            
+            // Calculate center of the container
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            
+            // Get cursor position relative to container
+            const cursorX = e.clientX - rect.left;
+            const cursorY = e.clientY - rect.top;
+            
+            // Calculate distance from center
+            const distance = Math.sqrt(
+                Math.pow(cursorX - centerX, 2) + 
+                Math.pow(cursorY - centerY, 2)
+            );
+            
+            // Update layer visibility based on distance
+            if (distance <= 60) {
+                // Inner Core only (closest to center)
+                showLayer('inner');
+            } 
+            else if (distance <= 120) {
+                // Inner + Outer Core
+                showLayer('outer');
+            } 
+            else if (distance <= 180) {
+                // Inner + Outer Core + Mantle
+                showLayer('mantle');
+            } 
+            else {
+                // All layers (farthest from center)
+                showLayer('crust');
+            }
+        });
+        
+        // Touch support for mobile devices
+        journeyContainer.addEventListener('touchmove', (e) => {
+            e.preventDefault(); // Prevent scrolling
+            
+            const touch = e.touches[0];
+            
+            // Get container dimensions
+            const rect = journeyContainer.getBoundingClientRect();
+            
+            // Calculate center of the container
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            
+            // Get touch position relative to container
+            const touchX = touch.clientX - rect.left;
+            const touchY = touch.clientY - rect.top;
+            
+            // Calculate distance from center
+            const distance = Math.sqrt(
+                Math.pow(touchX - centerX, 2) + 
+                Math.pow(touchY - centerY, 2)
+            );
+            
+            // Update layer visibility based on distance
+            if (distance <= 60) {
+                showLayer('inner');
+            } 
+            else if (distance <= 120) {
+                showLayer('outer');
+            } 
+            else if (distance <= 180) {
+                showLayer('mantle');
+            } 
+            else {
+                showLayer('crust');
+            }
+        });
+        
+        // Hide all layers and info
+        function hideAllLayers() {
+            innerCore.style.opacity = '0';
+            outerCore.style.opacity = '0';
+            mantle.style.opacity = '0';
+            crust.style.opacity = '0';
+            
+            innerCoreInfo.style.opacity = '0';
+            outerCoreInfo.style.opacity = '0';
+            mantleInfo.style.opacity = '0';
+            crustInfo.style.opacity = '0';
+        }
+        
+        // Show specific layer and its info
+        function showLayer(layer) {
+            hideAllLayers();
+            
+            if (layer === 'inner') {
+                innerCore.style.opacity = '1';
+                innerCoreInfo.style.opacity = '1';
+            }
+            else if (layer === 'outer') {
+                innerCore.style.opacity = '1';
+                outerCore.style.opacity = '1';
+                outerCoreInfo.style.opacity = '1';
+            }
+            else if (layer === 'mantle') {
+                innerCore.style.opacity = '1';
+                outerCore.style.opacity = '1';
+                mantle.style.opacity = '1';
+                mantleInfo.style.opacity = '1';
+            }
+            else if (layer === 'crust') {
+                innerCore.style.opacity = '1';
+                outerCore.style.opacity = '1';
+                mantle.style.opacity = '1';
+                crust.style.opacity = '1';
+                crustInfo.style.opacity = '1';
+            }
+        }
+        
+        // Escape key to exit journey view
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && journeyContainer.style.display === 'flex') {
+                journeyContainer.style.display = 'none';
+                hideAllLayers();
+            }
+        });
+        
+        // Show inner core by default when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            // Everything starts hidden, only shown when user interacts
+        });
+    </script>
+</body>
+</html>
